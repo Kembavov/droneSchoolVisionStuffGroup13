@@ -13,36 +13,46 @@ upper_threshold = (maxR, maxG, maxB)
 maskedImg = cv2.inRange(img, lower_threshold, upper_threshold)
 cv2.imwrite("grassMaskTest.png",maskedImg)
 
-calc_min = (51,75,57)
-calc_max = (238,250,250)
+calc_min = (50,50,50)
+calc_max = (230,255,255)
+for x in range(7):
+    imgnum = x
 
-new_img = cv2.imread("image.png")
+    new_img = cv2.imread(f"images_manual_outside_1/img_{imgnum}.jpg")
 
-mask = cv2.inRange(new_img, calc_min, calc_max)
+    mask = cv2.inRange(new_img, calc_min, calc_max)
 
-cv2.imwrite("grassMask.png",mask)
+    cv2.imwrite(f"images_manual_outside_1_output/mask_{imgnum}_out.png",mask)
 
-params = cv2.SimpleBlobDetector_Params()
- 
-params.filterByColor = True
-params.blobColor = 255
+    params = cv2.SimpleBlobDetector_Params()
 
-params.filterByArea = True
-params.minArea = 100
- 
-params.filterByCircularity = True
-params.minCircularity = 0.1
- 
-params.filterByConvexity = True
-params.minConvexity = 0.01
- 
-params.filterByInertia = True
-params.minInertiaRatio = 0.01
+    #params.minThreshold = 0
+    #params.maxThreshold = 255
+    params.filterByColor = True
+    params.blobColor = 0
 
-detector = cv2.SimpleBlobDetector_create(params)
 
-keypoints = detector.detect(mask)
+    params.minDistBetweenBlobs = 50
 
-im_keypoints = cv2.drawKeypoints(new_img, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-cv2.imwrite("im_keypoints.png",im_keypoints)
+
+    params.filterByArea = True
+    params.minArea = 1000
+    params.maxArea = 10000000000000000000000
+    
+    params.filterByCircularity = False
+    params.minCircularity = 0.01
+    
+    params.filterByConvexity = False
+    params.minConvexity = 0.01
+    
+    params.filterByInertia = False
+    params.minInertiaRatio = 0.01
+
+    detector = cv2.SimpleBlobDetector_create(params)
+
+    keypoints = detector.detect(mask)
+
+    im_keypoints = cv2.drawKeypoints(new_img, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+    cv2.imwrite(f"images_manual_outside_1_output/img_{imgnum}_out.png",im_keypoints)
