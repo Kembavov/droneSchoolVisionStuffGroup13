@@ -2,7 +2,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-img = cv2.imread("img_3_outside.jpg")
+img = cv2.imread("images_manual_outside_2/img_15.jpg")
 (B,G,R) = cv2.split(img)
 (minR,maxR,x,y) = cv2.minMaxLoc(R)
 (minG,maxG,x,y) = cv2.minMaxLoc(G)
@@ -12,29 +12,28 @@ lower_threshold = (minR, minG, minB)
 upper_threshold = (maxR, maxG, maxB)
 maskedImg = cv2.inRange(img, lower_threshold, upper_threshold)
 cv2.imwrite("grassMaskTest.png",maskedImg)
+print(lower_threshold)
+print(upper_threshold)
 
-calc_min = (50,50,50)
-calc_max = (230,255,255)
-for x in range(7):
+calc_min = (0,10,0)
+calc_max = (150,224,220)
+
+for x in range(15):
     imgnum = x
 
-    new_img = cv2.imread(f"images_manual_outside_1/img_{imgnum}.jpg")
+    new_img = cv2.imread(f"images_manual_outside_3/img_{imgnum}.jpg")
 
     mask = cv2.inRange(new_img, calc_min, calc_max)
 
-    cv2.imwrite(f"images_manual_outside_1_output/mask_{imgnum}_out.png",mask)
+    cv2.imwrite(f"images_manual_outside_3_output/mask_{imgnum}_out.png",mask)
 
     params = cv2.SimpleBlobDetector_Params()
 
-    #params.minThreshold = 0
-    #params.maxThreshold = 255
     params.filterByColor = True
     params.blobColor = 0
 
 
-    params.minDistBetweenBlobs = 50
-
-
+    params.minDistBetweenBlobs = 500
 
     params.filterByArea = True
     params.minArea = 1000
@@ -55,4 +54,4 @@ for x in range(7):
 
     im_keypoints = cv2.drawKeypoints(new_img, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-    cv2.imwrite(f"images_manual_outside_1_output/img_{imgnum}_out.png",im_keypoints)
+    cv2.imwrite(f"images_manual_outside_3_output/img_{imgnum}_out.png",im_keypoints)
