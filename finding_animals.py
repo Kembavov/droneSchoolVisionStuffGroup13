@@ -11,7 +11,7 @@ def main():
   thickness = 6
 
   # Find parameters for Mahalanobis
-  reference_color, covariance_matrix = findGrassValues("images_auto_outside_final/img_3.jpg")
+  reference_color, covariance_matrix = findGrassValues("animal_contour/img_5_grass.jpg")
 
   # Find countours of known Animals
   animal_files = {
@@ -21,16 +21,30 @@ def main():
         "animal_contour/gazelle.png": "Gazelle",            
         "animal_contour/elephant.png": "elephant",
         "animal_contour/zebra.png": "zebra",
+        "animal_contour/lion_weird.png": "Lion",
+
+        #"animal_contour/rhino.png": "Rhino",    
+        "animal_contour/img_20_lion.jpg": "Lion",            
+        "animal_contour/img_5_gazzel.jpg": "Gazelle",            
+        "animal_contour/img_5_elephant.jpg": "elephant",
+        "animal_contour/img_5_zebra.jpg": "zebra",
     }
   animal_contours = {}  # {filename: [contours]}
 
+  badcode = 0
   for file in animal_files:
+    badcode += 1
+    if badcode < 8:
         contours, img, drawing = findCountoursInFile(file, reference_color, covariance_matrix, 1)
+        animal_contours[file] = contours
+    else:
+        contours, img, drawing = findCountoursInFile(file, reference_color, covariance_matrix, 3)
         animal_contours[file] = contours
 
 
   # Find Countour of unknown Animals:
-  
+  reference_color, covariance_matrix = findGrassValues("images_auto_outside_final/img_3.jpg")
+
   target_fileName = [
         "images_auto_outside_final/img_6.jpg",
         "images_auto_outside_final/img_7.jpg",
@@ -83,7 +97,7 @@ def main():
     #plt.axis("off")
     #plt.show()
 
-    cv2.imwrite(f"finding_animals_output/img_{index}_out.png",target_img)
+    cv2.imwrite(f"finding_animals_output/2img_{index}_out.png",target_img)
 
 
 
@@ -104,6 +118,9 @@ def findGrassValues(fileName):
 
 
 def findCountoursInFile(fileName, reference_color, covariance_matrix, objectClass):  
+  # ObjectClass 1 assumes white background
+  # ObjectClass 2 plots images
+
   # Read and convert images to LAB
   img = cv2.imread(fileName) 
   start_img = cv2.imread(fileName) 
@@ -112,12 +129,12 @@ def findCountoursInFile(fileName, reference_color, covariance_matrix, objectClas
   image_scale_factor =  1.64977299e-7 * np.size(img)
   
   #Adding blur!
-  img_lab_blur = cv2.GaussianBlur(img_lab, (15, 15), 0)
+  img_lab_blur = cv2.GaussianBlur(img_lab, (35, 35), 0)
 
   if objectClass == 1: # If it is training images Do this 
     img_blur = cv2.GaussianBlur(img, (15, 15), 0)
-    if fileName == "animal_contour/lion.png":
-      img_blur = cv2.GaussianBlur(img_blur, (25, 25), 0)
+    #if fileName == "animal_contour/lion.png":
+    #  img_blur = cv2.GaussianBlur(img_blur, (35, 35), 0)
   
   #Flatten images
   pixels = np.reshape(img_lab_blur, (-1, 3))
@@ -144,7 +161,7 @@ def findCountoursInFile(fileName, reference_color, covariance_matrix, objectClas
 
   else: 
     mahalanobis_distance_image = 5 * 255 * mahalanobis_distance_image / np.max(mahalanobis_distance_image)
-    thresholdMask = 50
+    thresholdMask = 100
     mask = mahalanobis_distance_image < thresholdMask
 
 
